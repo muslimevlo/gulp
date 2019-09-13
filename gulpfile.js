@@ -36,6 +36,7 @@ function styles() {
     }))
     // выходная папка для стилей
     .pipe(gulp.dest('./bild/css'))
+    .pipe(browserSync.stream());
 }
 
 // Таск для скриптов JS
@@ -51,6 +52,7 @@ function scripts() {
     }))
     // выходная папка для скриптов
     .pipe(gulp.dest('./bild/js'))
+    .pipe(browserSync.stream());
 }
 //
 function clean(){
@@ -63,6 +65,14 @@ function watch(){
             baseDir: "./"
         }
     });
+    //следить за css файлами
+    gulp.watch('./src/css/**/*.css', styles)
+    //следить за js файлами
+    gulp.watch('./src/js/**/*.js', scripts)
+    // запуск синхронизации при изменении html
+    gulp.watch("./*.html").on('change', browserSync.reload);
+
+
 }
 // Таск вызывающий функцию styles
 gulp.task('styles', styles);
@@ -70,3 +80,9 @@ gulp.task('styles', styles);
 gulp.task('scripts', scripts);
 //таска для очистки папкиBild
 gulp.task('del', clean);
+// таска для отслеживания изменений
+gulp.task('watch', watch);
+// таск для удаления файлов в bild и заска styles, scripts
+gulp.task('bild', gulp.series(clean, gulp.parallel(styles, scripts)));
+// таска запуска bild и watch
+gulp.task('dev', gulp.series('bild', 'watch'));
